@@ -1,8 +1,9 @@
 # Jenkins Docker Image
 
-Enhanced Jenkins image with essential development tools pre-installed.
-
+**GitHub:** https://github.com/tackleza/docker-jenkins
 **Docker Hub:** https://hub.docker.com/r/tackleza/jenkins
+
+Enhanced Jenkins image with essential development tools pre-installed.
 
 Based on the official [`jenkins/jenkins`](https://hub.docker.com) image. Everything from the official image is included, with additional tools added for common development workflows.
 
