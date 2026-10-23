@@ -7,6 +7,6 @@ COPY --from=node_runtime /usr/local/bin/node /usr/local/bin/node
 COPY --from=node_runtime /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
 RUN ln -sf ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -sf ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
-    && npm install -g pnpm@10.33.4 \
+    && npm install -g npm@11.21.1 pnpm@10.34.7 \
     && node --version && npm --version && pnpm --version
 USER jenkins
