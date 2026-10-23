@@ -3,7 +3,7 @@ const { Worker } = require('node:worker_threads');
 const fs = require('node:fs');
 const Module = require('node:module');
 const bundle = '/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs';
-function bundledIPv6() {
+function bundledModule(expression = 'require_ipv6()') {
   const source = fs.readFileSync(bundle, 'utf8');
   const marker = '// lib/pnpm.js';
   assert.equal(source.split(marker).length, 2);
@@ -11,7 +11,7 @@ function bundledIPv6() {
   testModule.filename = bundle;
   testModule.paths = Module._nodeModulePaths(require('node:path').dirname(bundle));
   // Load the actual bundled module definitions; exclude pnpm's CLI entry point.
-  testModule._compile(source.slice(0, source.indexOf(marker)) + '\nmodule.exports = require_ipv6();', bundle);
+  testModule._compile(source.slice(0, source.indexOf(marker)) + '\nmodule.exports = ' + expression + ';', bundle);
   return testModule.exports;
 }
 const paths = [
@@ -42,11 +42,28 @@ const paths = [
       worker.once('error', error => { clearTimeout(timer); reject(error); });
     });
   }
-  const { Address6 } = bundledIPv6();
+  const { Address6 } = bundledModule();
   assert.equal(new Address6('2001:0db8::1').correctForm(), '2001:db8::1');
   assert.equal(new Address6('fe80::1%eth0').zone, '%eth0');
   const started = performance.now();
   assert(!Address6.isValid('%'.repeat(1024 * 1024) + '\n'));
   assert(performance.now() - started < 2000, 'Actual pnpm embedded parser must reject promptly');
+  const uuid = bundledModule('(() => { init_v3(); init_v5(); return { v3: v3_default, v5: v5_default }; })()');
+  const namespace = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+  for (const [fn, expected] of [
+    [uuid.v3, '5df41881-3aed-3515-88a7-2f4a814cf09e'],
+    [uuid.v5, '2ed6657d-e927-568b-95e1-2665a8aea6a2'],
+  ]) {
+    assert.equal(fn('www.example.com', namespace), expected);
+    const output = Buffer.alloc(20);
+    assert.equal(fn('www.example.com', namespace, output, 4), output);
+    assert.equal(output.subarray(4).toString('hex'), expected.replaceAll('-', ''));
+    for (const [size, offset] of [[8, 4], [16, -1], [16, 1]]) {
+      const invalid = Buffer.alloc(size, 0xaa);
+      assert.throws(() => fn('www.example.com', namespace, invalid, offset), RangeError);
+      assert(invalid.every(byte => byte === 0xaa), 'Invalid bounds must not partially modify the buffer');
+    }
+  }
   console.log('npm/pnpm IPv4, IPv6, zone and advisory regression checks passed');
+  console.log('Actual bundled uuid v3/v5 canonical vectors, buffers and bounds checks passed');
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

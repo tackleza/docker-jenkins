@@ -27,5 +27,26 @@ assert.equal(source.split(before).length, 2, 'Expected exactly one bundled vulne
 let patched = source.replace(before, after);
 patched = patched.replaceAll('.pnpm/ip-address@10.7.3/', '.pnpm/ip-address@10.7.4/');
 assert(!patched.includes('RE_ZONE_STRING.exec(address)'));
+// uuid9 is also embedded. Backport the upstream output-buffer guard for v3/v5
+// (GHSA-w5hq-g745-h8pq); uuid9 has no v6 implementation.
+const uuidBefore = `    if (buf) {
+      offset = offset || 0;
+      for (let i = 0; i < 16; ++i) {
+        buf[offset + i] = bytes[i];
+      }
+      return buf;
+    }`;
+const uuidAfter = `    if (buf) {
+      offset = offset || 0;
+      if (offset < 0 || offset + 16 > buf.length) {
+        throw new RangeError('UUID byte range is out of buffer bounds');
+      }
+      for (let i = 0; i < 16; ++i) {
+        buf[offset + i] = bytes[i];
+      }
+      return buf;
+    }`;
+assert.equal(patched.split(uuidBefore).length, 2, 'Expected exactly one uuid v35 output-buffer writer');
+patched = patched.replace(uuidBefore, uuidAfter);
 fs.writeFileSync(file, patched);
-console.log('pnpm10.34.7 bundled IPv6 constructor patched with the verified upstream10.7.4 algorithm');
+console.log('pnpm10.34.7 bundled IPv6 parser and uuid v3/v5 buffer bounds patched');
