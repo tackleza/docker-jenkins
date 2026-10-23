@@ -68,3 +68,13 @@ republished by that maintenance workflow.
 
 Sources: [official security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases),
 [upstream support status](https://nodejs.org/en/about/previous-releases).
+
+## Bundled package-manager security patch
+
+The images retain npm11.21.1 and pnpm10.34.7. Their bundled `ip-address` copies are replaced with the exact upstream10.7.4 package to fix [GHSA-rxp7-6hxx-x8q5](https://github.com/advisories/GHSA-rxp7-6hxx-x8q5). The Dockerfiles verify the archive SHA256, require both expected package locations and preserve root ownership. The pnpm executable also embeds its own copy: a checksum-guarded backport applies the exact upstream zone-parser fix there, and tests exercise the embedded module independently. This is a reviewed downstream dependency patch; reinstalling either package manager can restore the vulnerable dependency until upstream includes the fix.
+
+Run `node tests/ip-address.cjs` inside either built image (the script can be supplied on stdin). Validation covers address parsing, IPv6 zone behavior and bounded rejection of the advisory input. Check the actual installed package trees when auditing bundled tooling.
+
+Default-branch pushes and manual GitHub Actions runs always build security source changes. Scheduled runs retain the Jenkins-base digest check. Build scripts stop at the first failed build or push.
+
+The published images record the source revision in `org.opencontainers.image.revision`. Future npm/pnpm version changes must reassess/remove the downstream patch; its checksum/version guards intentionally fail if the expected bundle changes. Build a variant from the repository root with `docker build -f latest/Dockerfile .`, or run its existing `build.sh` from the variant directory.
