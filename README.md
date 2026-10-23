@@ -75,6 +75,6 @@ The images retain npm11.21.1 and pnpm10.34.7. Their bundled `ip-address` copies 
 
 Run `node tests/ip-address.cjs` inside either built image (the script can be supplied on stdin). Validation covers address parsing, IPv6 zone behavior and bounded rejection of the advisory input. Check the actual installed package trees when auditing bundled tooling.
 
-Pushes and manual GitHub Actions runs always build security source changes. Scheduled runs retain the Jenkins-base digest check. Build scripts stop at the first failed build or push.
+Default-branch pushes and manual GitHub Actions runs always build security source changes. Scheduled runs retain the Jenkins-base digest check. Build scripts stop at the first failed build or push.
 
 The published images record the source revision in `org.opencontainers.image.revision`. Future npm/pnpm version changes must reassess/remove the downstream patch; its checksum/version guards intentionally fail if the expected bundle changes. Build a variant from the repository root with `docker build -f latest/Dockerfile .`, or run its existing `build.sh` from the variant directory.

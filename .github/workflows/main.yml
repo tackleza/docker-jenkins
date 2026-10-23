@@ -2,6 +2,7 @@ name: docker-jenkins-builder
 
 on:
   push:
+    branches: [master]
   workflow_dispatch:
   schedule:
     - cron: '0 0 */3 * *'  # Run every 3 days at midnight UTC
