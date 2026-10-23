@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/bin/sh
+set -eu
 
-bash -c "cd alpine-jdk21; sh build.sh; sh push.sh"
-bash -c "cd debian-jdk21; sh build.sh; sh push.sh"
-bash -c "cd latest; sh build.sh; sh push.sh"
+for variant in alpine-jdk21 debian-jdk21 latest; do
+  (cd "$variant" && sh build.sh && sh push.sh)
+done

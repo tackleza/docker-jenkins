@@ -36,7 +36,10 @@ jobs:
           echo "Latest digest: $DIGEST"
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
-          if [ -f .digest ]; then
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "[INFO] Source push or manual security build. Building all images."
+            echo "build_needed=true" >> "$GITHUB_OUTPUT"
+          elif [ -f .digest ]; then
             echo "Found cached .digest file. Comparing with latest..."
             if grep -q "$DIGEST" .digest; then
               echo "[INFO] Base image unchanged. Skipping Docker build."
