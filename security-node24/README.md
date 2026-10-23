@@ -2,8 +2,10 @@
 
 The 2026-10-23 SVD01 snapshot/release controller image bundled EOL Node 20.19.2.
 This recipe replaces only the Node executable with official patched Node
-24.22.1 LTS, preserving the exact existing Jenkins 2.565/JDK21 image, npm
-11.15.0, pnpm10.33.4 and other tools. It is a uniquely tagged maintenance image;
+24.22.1 LTS, preserving the exact existing Jenkins 2.565/JDK21 image.
+A subsequent installed-package audit found vulnerabilities in its old package
+managers, so npm is patched within major11 to11.21.1 and pnpm within major10
+to10.34.7. Other application tools remain unchanged. It is a uniquely tagged maintenance image;
 it does not republish or move the shared `latest` tag.
 
 Before using a shared runtime, inspect every controller job and queued/running
@@ -27,3 +29,11 @@ separate from this security release.
 
 Advisory: https://nodejs.org/en/blog/vulnerability/october-2026-security-releases
 Support: https://nodejs.org/en/about/previous-releases
+
+The follow-up installed-tree audit of npm11.21.1/pnpm10.34.7 removed the
+critical/high findings from the original toolchain. One moderate advisory
+remains in bundled `ip-address`10.7.2/10.7.3 (GHSA-rxp7-6hxx-x8q5). Do not
+interpret the runtime patch as a clean dependency audit. Track an upstream
+package-manager fix; do not replace an embedded dependency blindly. An isolated
+npm install, pnpm lockfile import/frozen install, and Node Brotli roundtrip
+passed with the patched toolchain.
