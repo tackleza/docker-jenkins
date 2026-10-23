@@ -78,3 +78,7 @@ Run `node tests/ip-address.cjs` inside either built image (the script can be sup
 Default-branch pushes and manual GitHub Actions runs always build security source changes. Scheduled runs retain the Jenkins-base digest check. Build scripts stop at the first failed build or push.
 
 The published images record the source revision in `org.opencontainers.image.revision`. Future npm/pnpm version changes must reassess/remove the downstream patch; its checksum/version guards intentionally fail if the expected bundle changes. Build a variant from the repository root with `docker build -f latest/Dockerfile .`, or run its existing `build.sh` from the variant directory.
+
+### Embedded UUID buffer bounds
+
+The pnpm bundle also contains uuid9.0.1 code affected by [GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq). The same guarded patch script backports upstream's bounds check to the embedded v3/v5 buffer writer; uuid9 does not implement v6. Tests load the actual bundled functions and verify canonical vectors, valid output buffers and rejection before partial writes for undersized/negative/overflow bounds. This avoids changing the shared pnpm major. Version-based scanners can still identify uuid9.0.1; record this source backport and its regression tests rather than treating the bundle as an unmodified vulnerable release.

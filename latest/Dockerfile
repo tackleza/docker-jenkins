@@ -23,3 +23,4 @@ RUN ln -sf ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && node --version && npm --version && pnpm --version
 USER jenkins
 LABEL org.apidech.security.ip-address="10.7.4" org.apidech.security.pnpm-bundle="GHSA-rxp7-6hxx-x8q5"
+LABEL org.apidech.security.uuid-bounds="GHSA-w5hq-g745-h8pq"
