@@ -22,14 +22,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .digest
-          key: jenkins-base-digest-${{ runner.os }}
+          key: jenkins-jdk25-base-digest-${{ runner.os }}
           restore-keys: |
-            jenkins-base-digest-
+            jenkins-jdk25-base-digest-
 
       - name: Pull latest Jenkins image and get digest
         id: check
         run: |
-          LATEST_IMAGE=jenkins/jenkins:latest
+          LATEST_IMAGE=jenkins/jenkins:latest-jdk25
 
           echo "Checking latest digest from: $LATEST_IMAGE"
           DIGEST=$(docker pull "$LATEST_IMAGE" | grep Digest | awk '{print $2}')

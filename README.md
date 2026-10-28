@@ -13,9 +13,17 @@ Based on the official [`jenkins/jenkins`](https://hub.docker.com) image. Everyth
 
 | Tag | Description |
 |-----|-------------|
-| `latest` | Jenkins on Debian with JDK 21 |
+| `latest` | Jenkins on Debian with JDK 25 |
+| `debian-jdk25` | Jenkins on Debian with JDK 25 |
+| `alpine-jdk25` | Jenkins on Alpine with JDK 25 |
 | `debian-jdk21` | Jenkins on Debian with JDK 21 |
 | `alpine-jdk21` | Jenkins on Alpine with JDK 21 |
+
+The `latest` tag follows the official `jenkins/jenkins:latest-jdk25` base.
+Explicit JDK 21 tags remain available for compatibility. JDK 25 variants use
+the official upstream Jenkins JDK 25 images; no separate JDK is installed.
+The immutable `security-node24` emergency overlay preserves its historical JDK 21
+base and is not part of the regular build matrix.
 
 ## Included Tools
 
